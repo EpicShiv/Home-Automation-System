@@ -2,7 +2,7 @@
  * Title: Home Automation System (Remote and Manual Switch Control)
  * Version 1.0
  * Written by Shiva Teja (B.S.T)
- * GitHub Link: https://github.com/bst415/Home-Automtion-System
+ * GitHub Link: https://github.com/EpicShiv/Home-Automtion-System
  * 
  * BSD 3-Clause License
  * Copyright (c) 2021, SHIVA TEJA
