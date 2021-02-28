@@ -4,5 +4,5 @@ This code is the first version (V1.0) written in a simple format without using o
 If you are looking for more advanced code relating to Home automation please checkout the repository link given below, which includes different versions depending on usability of various transducers and modules.
 
 ## Author
-Shiva Teja ([@bst-415](https://github.com/bst-415))
-Github link: https://github.com/bst-415/Home-Automation-System
+Shiva Teja ([@bst-415](https://github.com/EpicShiv))
+Github link: https://github.com/EpicShiv/Home-Automation-System
