@@ -5,4 +5,5 @@ If you are looking for more advanced code relating to Home automation please che
 
 ## Author
 Shiva Teja ([@bst-415](https://github.com/EpicShiv))
+
 Github link: https://github.com/EpicShiv/Home-Automation-System
