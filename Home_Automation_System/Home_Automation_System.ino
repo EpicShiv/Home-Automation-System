@@ -1,6 +1,6 @@
 /*
  * Title: Home Automation System (Remote and Manual Switch Control)
- * Version 1.0
+ * Version 2.0
  * Written by Shiva Teja (B.S.T)
  * GitHub Link: https://github.com/EpicShiv/Home-Automtion-System
  * 
@@ -27,57 +27,36 @@
   #define R_Low LOW
 #endif
 
-int a, b, c, d, e, f, g, h;
+#define No_Of_Relays 4            // Mention the number of relays used.
+
+int prev_r[No_Of_Relays];         // Initializing an array variable to store previous reading of manual switches.
 
 // Define the GPIO connected with Relays and switches.
-#define R1 2          // Relay 1 connected to digital pin D2.
-#define R2 3          // Relay 2 connected to digital pin D3.
-#define R3 4          // Relay 3 connected to digital pin D4.
-#define R4 5          // Relay 4 connected to digital pin D5.
-
-#define S1 8          // Switch 1 connected to digital pin D8.
-#define S2 9          // Switch 2 connected to digital pin D9.
-#define S3 10         // Switch 3 connected to digital pin D10.
-#define S4 11         // Switch 4 connected to digital pin D11.
-
-int R1_State = 1;     // Define integer to remember the state for relay 1.
-int R2_State = 1;     // Define integer to remember the state for relay 2.
-int R3_State = 1;     // Define integer to remember the state for relay 3.
-int R4_State = 1;     // Define integer to remember the state for relay 4.
+const int R[No_Of_Relays] = {2, 3, 4, 5};     // Relay 1, 2, 3, 4 are connected to digital pin D2, D3, D4, D5.
+const int S[No_Of_Relays] = {8, 9, 10, 11};   // Switch 1, 2, 3, 4 are connected to digital pin D8, D9, D10, D11.
+int State[No_Of_Relays];                      // Initializing the variable state for all relays.
 
 void setup()
 {
-  // Define R1, R2, R3, R4 as an output pins.
-  pinMode(R1, OUTPUT);
-  pinMode(R2, OUTPUT);
-  pinMode(R3, OUTPUT);
-  pinMode(R4, OUTPUT);
-
-  // Define S1, S2, S3, S4 as input pullup pins. (i.e., Virtually connected to a pullup resisitors always high)
-  pinMode(S1, INPUT_PULLUP);
-  pinMode(S2, INPUT_PULLUP);
-  pinMode(S3, INPUT_PULLUP);
-  pinMode(S4, INPUT_PULLUP);
-
-  //During Starting all Relays should be TURN OFF.
-  digitalWrite(R1, R1_State);
-  digitalWrite(R2, R2_State);
-  digitalWrite(R3, R3_State);
-  digitalWrite(R4, R4_State);
-  
-  Serial.begin(9600);         // Initializes to start recieve and transmit the serial data.
-
+  for (int i = 0; i < No_Of_Relays; i++)
+  {
+    pinMode(R[i], OUTPUT);        // Define all pins connected to relays as output pins.
+    pinMode(S[i], INPUT_PULLUP);  // Define all pins connected to switches as input pullup pins. (i.e., Virtually connected to a pullup resisitors always high)
+    State[i] = R_Low;             // Set the state for all relay.
+    digitalWrite(R[i], State[i]); // During Start all Relays should be TURN OFF.
+  }
+  Serial.begin(9600);             // Initializes to start recieve and transmit the serial data.
 }
 
 void loop()
 {
-   if (Serial.available())    // Executes loop if Serial is available.
+   if (Serial.available())        // Executes loop if Serial is available.
   {
-    remoteSwitch();           // Operates by remote switches. (such as mobile app, IR remote, voice commands and etc.,)
+    remoteSwitch();               // Operates by remote switches. (such as mobile app, IR remote, voice commands and etc.,)
   }
-  else                        // Executes loop if Serial is not available.
+  else                            // Executes loop if Serial is not available.
   {
-    manualSwitch();           // Operates by manual switches.
+    manualSwitch();               // Operates by manual switches.
   }
 }
 
@@ -85,120 +64,40 @@ void loop()
 void relayOnOff(int relay)
 {
   // Operation is done by switching to specified relay.
-  switch(relay)
+  if(relay >= 0 and relay < No_Of_Relays)
   {
-    case 1:
-    if(!R1_State)
+    if(State[relay] == 0)
     {
-      digitalWrite(R1, R_High);       // Turns on relay 1.
-      R1_State = 1;                   // Sets or changes the relay 1 state to ON.
-      DUMPS("\r\n Relay 1 is ON");    // Useful while debugging.
+      digitalWrite(R[relay], R_High);                       // Turns on respective relay.
+      State[relay] = 1;                                     // Sets the respective relay state to ON.
+      DUMPS("\r\n Relay "+ String(relay + 1) +" is ON");    // Useful while debugging.
     }
-    else
+    else if(State[relay] == 1)
     {
-      digitalWrite(R1, R_Low);        // Turns off relay 1.
-      R1_State = 0;                   // Sets the relay 1 state to OFF.
-      DUMPS("\r\n Relay 1 is OFF");   // Useful while debugging.
+      digitalWrite(R[relay], R_Low);                        // Turns off respective relay.
+      State[relay] = 0;                                     // Sets the respective relay state to OFF.
+      DUMPS("\r\n Relay "+ String(relay + 1) +" is OFF");   // Useful while debugging.
     }
-    delay(100);
-    break;
-    case 2:
-    if(R2_State == 0)
-    {
-      digitalWrite(R2, R_High);       // Turns on relay 2.
-      R2_State = 1;                   // Sets or changes the relay 2 state to ON.
-      DUMPS("\r\n Relay 2 is ON");    // Useful while debugging.
-    }
-    else
-    {
-      digitalWrite(R2, R_Low);         // Turns on relay 2.
-      R2_State = 0;                    // Sets or changes the relay 2 state to OFF.
-      DUMPS("\r\n Relay 2 is OFF");    // Useful while debugging.
-    }
-    delay(100);
-    break;
-    case 3:
-    if(R3_State == 0)
-    {
-      digitalWrite(R3, R_High);       // Turns on relay 3.
-      R3_State = 1;                   // Sets or changes the relay 3 state to ON.
-      DUMPS("\r\n Relay 3 is ON");    // Useful while debugging.
-    }
-    else
-    {
-      digitalWrite(R3, R_Low);        // Turns on relay 3.
-      R3_State = 0;                   // Sets or changes the relay 3 state to OFF.
-      DUMPS("\r\n Relay 3 is OFF");   // Useful while debugging.
-    }
-    delay(100);
-    break;
-    case 4:
-    if(R4_State == 0)
-    {
-      digitalWrite(R4, R_High);       // Turns on relay 4.
-      R4_State = 1;                   // Sets or changes the relay 4 state to ON.
-      DUMPS("\r\n Relay 4 is ON");    // Useful while debugging.
-    }
-    else
-    {
-      digitalWrite(R4, R_Low);        // Turns off relay 4.
-      R4_State = 0;                   // Sets or changes the relay 4 state to OFF.
-      DUMPS("\r\n Relay 4 is OFF");   // Useful while debugging.
-    }
-    delay(100);
-    break;
-    default : break;
   }
+  delay(100);
 }
 
 // This function is used to control relays via manual switches.
 void manualSwitch()
 {
-  // Operation is done by switching to respective relay.
-  a = digitalRead(S1);          // Stores the Switch 1 input in variiable 'a'.
-  while(!a == b)                // Executes the loop if change in switch 1 state is detected.
+  // Operation is done by switching to specified relay.
+  for (int i = 0; i < No_Of_Relays; i++)                  // Iterates the loop to the number relays.
   {
-    relayOnOff(1);              // Turns ON/OFF the relay respective to its state.
-    b = a;                      // assigns previous input to 'b' to exit from loop.
-  }
-  c = digitalRead(S2);
-  while(!c == d)
-  {
-    relayOnOff(2);
-    d = c;
-  }
-  e = digitalRead(S3);
-  while(!e == f)
-  {
-    relayOnOff(3);
-    f = e;
-  }
-  g = digitalRead(S4);
-  while(!g == h)
-  {
-    relayOnOff(4);
-    h = g;
+    if(!digitalRead(S[i]) == prev_r[i])                   // Executes the loop if change in switch state is detected.
+    {
+      relayOnOff(i);                                      // Turns ON/OFF the relay respective to its state.
+      prev_r[i] = digitalRead(S[i]);                      // Assigns switch reading to 'prev_r' to exit from loop.
+    }
   }
 }
 
-// This function is used to control relays via Remote switches. (such as mobile app, IR remote, voice commands and etc.,)
+// This function is used to control relays via remote switches. (such as mobile app, IR remote, voice commands and etc.,)
 void remoteSwitch()
 {
-  switch (Serial.read())
-  {
-    case 'A':
-    relayOnOff(1);
-    break;
-    case 'B':
-    relayOnOff(2);
-    break;
-    case 'C':
-    relayOnOff(3);
-    break;
-    case 'D':
-    relayOnOff(4);
-    break;
-    default:
-    break;
-   }
+  relayOnOff(int(map(Serial.read(), 'A', 'Z', 0, 25)));
 }
