@@ -9,6 +9,12 @@
  * All rights reserved.
  */
 
+ /*
+  * This code is written assuming the board to be used is ESP-12E or ESP-12F or NodeMCU which is based on ESP8266 controller.  
+  * If you are using any other microcontroller other than ESP8266 please change the code carefully as for your requirements.
+  * Or else you can also check Git Repo: https://github.com/EpicShiv/Home-Automtion-System  for seperate code for microcontroller and ESP8266 generic module.
+  */
+
 // While uploading code define "DEBUG" to "0" and for debugging change it to "1".
 #define DEBUG 1
 #if DEBUG
@@ -32,9 +38,9 @@
 int prev_r[No_Of_Relays];         // Initializing an array variable to store previous reading of manual switches.
 
 // Define the GPIO connected with Relays and switches.
-const int R[No_Of_Relays] = {2, 3, 4, 5};     // Relay 1, 2, 3, 4 are connected to digital pin D2, D3, D4, D5.
-const int S[No_Of_Relays] = {8, 9, 10, 11};   // Switch 1, 2, 3, 4 are connected to digital pin D8, D9, D10, D11.
-int State[No_Of_Relays];                      // Initializing the variable state for all relays.
+const int R[No_Of_Relays] = {A0, 5, 4, 2};      // Relay 1, 2, 3, 4 are connected to the respective GPIO pins of ESP-12F.
+const int S[No_Of_Relays] = {13, 12, 14, 16};   // Switch 1, 2, 3, 4 are connected to the respective GPIO pins of ESP-12F.
+int State[No_Of_Relays];                        // Initializing the variable state for all relays.
 
 void setup()
 {
@@ -45,6 +51,7 @@ void setup()
     State[i] = R_Low;             // Set the state for all relay.
     digitalWrite(R[i], State[i]); // During Start all Relays should be TURN OFF.
   }
+  
   Serial.begin(9600);             // Initializes to start recieve and transmit the serial data.
 }
 
